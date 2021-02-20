@@ -77,5 +77,6 @@ if __name__ == '__main__':
     bot.add_cog(test.Test(bot))
     bot.add_cog(inscription.Inscription(bot))
     bot.add_cog(oclass.OClass(bot))
+    bot.add_cog(homework.Homework(bot))
 
     bot.run(TOKEN)
