@@ -29,5 +29,6 @@ if __name__ == '__main__':
 
     # Loading cogs
     bot.add_cog(test.Test(bot))
+    bot.add_cog(homework.Homework(bot))
 
     bot.run(TOKEN)
