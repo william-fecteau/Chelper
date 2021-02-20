@@ -14,11 +14,16 @@ bot = commands.Bot(command_prefix='!')
 
 dicGuilds = dict()
 
-categoriesName = ["Teacher-update", "Teacher-zone", "Student-zone"]
-
+categoriesName = ["Verification", "Teacher-update", "Teacher-zone", "Student-zone"]
 textChannelsName = {
-    "Teacher-update": [""],
+    "Verification": ["verification"],
+    "Teacher-update": ["actions"],
+    "Teacher-zone": [],
+    "Student-zone": [],
 }
+
+hardcodedStudents = [{"id": "1835343", "firstName": "William", "lastName": "Fecteau"}]
+
 
 @bot.event
 async def on_ready():
@@ -33,8 +38,6 @@ async def on_guild_join(guild):
     # Creating the first text channel (#actions)
     cTeacherUpdate = utils.get(guild.categories, name="Teacher-update")
     tcAction = utils.get(cTeacherUpdate.text_channels, name="actions")
-    if not tcAction:
-        tcAction = await cTeacherUpdate.create_text_channel("actions")
 
     dicGuilds[guild.id]["isCreating"] = True
     dicGuilds[guild.id]["step"] = 0
@@ -57,10 +60,16 @@ async def InitServer(guild):
     dicGuilds[guild.id]["isCreating"] = False
 
     for categoryName in categoriesName:
+        # Creating category
         curCategory = utils.get(guild.categories, name=categoryName)
         if curCategory == None:
             curCategory = await guild.create_category_channel(categoryName)
-
+        
+        # Creating text channels for this category
+        for tcName in textChannelsName[categoryName]:
+            curTextChannel = utils.get(curCategory.text_channels, name=tcName)
+            if not curTextChannel:
+                curTextChannel = await curCategory.create_text_channel(tcName)
 
 if __name__ == '__main__':
     # .ENV loading
@@ -75,7 +84,7 @@ if __name__ == '__main__':
 
     # Loading cogs
     bot.add_cog(test.Test(bot))
-    bot.add_cog(inscription.Inscription(bot))
+    bot.add_cog(inscription.Inscription(bot, dicGuilds))
     bot.add_cog(oclass.OClass(bot))
     bot.add_cog(homework.Homework(bot))
 
