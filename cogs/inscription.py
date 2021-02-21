@@ -27,11 +27,15 @@ class Inscription(commands.Cog):
 
                     await message.author.edit(nick="{} {}".format(student["firstName"], student["lastName"]))
                     msg = "Hi {} {}! Your account is now validated".format(student["firstName"], student["lastName"])
-                    self.dicGuilds[message.guild.id]["registredStudents"].append(student)
 
-                del self.dicGuilds[message.guild.id]["students"][message.content]
-                await message.delete()
+                    roleName = "Group" + str(student["group"])
+                    await message.author.add_roles(utils.get(message.guild.roles, name=roleName))
+                    
+                    self.dicGuilds[message.guild.id]["registredStudents"].append(student)
+                    del self.dicGuilds[message.guild.id]["students"][message.content]
+
                 await tcVerification.send(msg)
+                await message.delete()
 
 
 
