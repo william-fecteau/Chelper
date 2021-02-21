@@ -28,6 +28,13 @@ registredStudents = []
 @bot.event
 async def on_ready():
     for guild in bot.guilds:
+        # TODO: FOR TESTING REMOVE LATER
+        # TODO dicGuilds should come from DB
+        dicGuilds[guild.id] = {}
+        dicGuilds[guild.id]["nbGroup"] = 2
+        dicGuilds[guild.id]["isCreating"] = False
+        dicGuilds[guild.id]["students"] = hardcodedStudents
+        dicGuilds[guild.id]["registredStudents"] = registredStudents
         await InitServer(guild)
 
 
@@ -35,14 +42,17 @@ async def on_ready():
 async def on_guild_join(guild):
     for channel in guild.channels:
         await channel.delete()
-
-    # TODO: Faire le InitServer à la fin du setup du serveur
-    await InitServer(guild)
     
     # Creating the first text channel (#actions)
     cTeacherUpdate = utils.get(guild.categories, name="Teacher-update")
-    tcAction = utils.get(cTeacherUpdate.text_channels, name="actions")
+    if cTeacherUpdate == None:
+        cTeacherUpdate = await guild.create_category_channel("Teacher-update")
 
+    tcAction = utils.get(cTeacherUpdate.text_channels, name="actions")
+    if tcAction == None:
+        tcAction = await cTeacherUpdate.create_text_channel("actions")
+
+    dicGuilds[guild.id] = {}
     dicGuilds[guild.id]["isCreating"] = True
     dicGuilds[guild.id]["step"] = 0
     await tcAction.send("Hi! What is the name of your class?")
@@ -60,23 +70,19 @@ async def on_message(message):
                 await message.channel.send("How many groups would you like to create?")
             elif dicGuilds[message.guild.id]["step"] == 1:
                 nb = -1
+                valid = True
                 try:
                     nb = int(message.content)
                 except:
                     await message.channel.send("Please use a valid integer")
+                    valid = False
 
                 if nb > 0:
-                    for i in range(nb):
-                        tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
-                        ctrlChannel = await tempCategorie.create_text_channel("control " + str(i+1))
-                        await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
-                        tempCategorie= utils.get(message.guild.categories, name="Student-zone")
-                        await tempCategorie.create_text_channel("Group" + str(i+1))
-                        await tempCategorie.create_voice_channel("Group" +  str(i+1))
-                        await message.guild.create_role(name="Group" +  str(i+1))
+                    dicGuilds[message.guild.id]["nbGroup"] = nb
+                    dicGuilds[message.guild.id]["step"] += 1
 
-                        dicGuilds[message.guild.id]["step"] += 1
-                else:
+                    await InitServer(message.guild)
+                elif valid:
                     await message.channel.send("Please use a number greater than 0")
     else:
         await bot.process_commands(message)
@@ -84,12 +90,6 @@ async def on_message(message):
 
 
 async def InitServer(guild):
-    dicGuilds[guild.id] = {}
-
-    dicGuilds[guild.id]["isCreating"] = False
-    dicGuilds[guild.id]["students"] = hardcodedStudents
-    dicGuilds[guild.id]["registredStudents"] = registredStudents
-
     for categoryName in categoriesName:
         # Creating category
         curCategory = utils.get(guild.categories, name=categoryName)
@@ -101,6 +101,17 @@ async def InitServer(guild):
             curTextChannel = utils.get(curCategory.text_channels, name=tcName)
             if not curTextChannel:
                 curTextChannel = await curCategory.create_text_channel(tcName)
+        
+    # Creating channels for all the groups
+    for i in range(1, dicGuilds[guild.id]["nbGroup"] + 1):
+        tempCategorie = utils.get(guild.categories, name="Teacher-zone")
+        ctrlChannel = await tempCategorie.create_text_channel("control " + str(i))
+        tempCategorie= utils.get(guild.categories, name="Student-zone")
+        await tempCategorie.create_text_channel("Group" + str(i))
+        await tempCategorie.create_voice_channel("Group" +  str(i))
+        await guild.create_role(name="Group" +  str(i))
+
+            # await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
 
 if __name__ == '__main__':
     # .ENV loading
