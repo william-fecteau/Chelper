@@ -104,14 +104,25 @@ async def InitServer(guild):
         
     # Creating channels for all the groups
     for i in range(1, dicGuilds[guild.id]["nbGroup"] + 1):
-        tempCategorie = utils.get(guild.categories, name="Teacher-zone")
-        ctrlChannel = await tempCategorie.create_text_channel("control " + str(i))
-        tempCategorie= utils.get(guild.categories, name="Student-zone")
-        await tempCategorie.create_text_channel("Group" + str(i))
-        await tempCategorie.create_voice_channel("Group" +  str(i))
-        await guild.create_role(name="Group" +  str(i))
+        control_channel_name = "control-{}".format(i)
+        group_channel_name = "group-{}".format(i)
 
-            # await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
+        cTeacherZone = utils.get(guild.categories, name="Teacher-zone")
+        tcControl = utils.get(cTeacherZone.text_channels, name = control_channel_name)
+        if tcControl == None: 
+            ctrlChannel = await cTeacherZone.create_text_channel(control_channel_name)
+
+        cStudentZone = utils.get(guild.categories, name="Student-zone")
+        tcGroup = utils.get(cStudentZone.text_channels, name=group_channel_name)
+        if tcGroup == None:
+            await cStudentZone.create_text_channel(group_channel_name)
+        vcGroup = utils.get(cStudentZone.voice_channels, name=group_channel_name)
+        if vcGroup == None:
+            await cStudentZone.create_voice_channel(group_channel_name)
+
+        await guild.create_role(name=group_channel_name)
+
+        # await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
 
 if __name__ == '__main__':
     # .ENV loading
