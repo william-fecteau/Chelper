@@ -15,27 +15,30 @@ class Inscription(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not message.author.bot:
+        if not message.author.bot and message.guild != None:
             cVerification = utils.get(message.guild.categories, name="Verification")
-            tcVerification = utils.get(cVerification.text_channels, name="verification")
-
             
-            if message.channel == tcVerification:
-                msg = "This is not a valid id"
-                if message.content in self.dicGuilds[message.guild.id]["students"]:
-                    student = self.dicGuilds[message.guild.id]["students"][message.content]
+            # Si la catégorie existe
+            if cVerification != None:
 
-                    await message.author.edit(nick="{} {}".format(student["firstName"], student["lastName"]))
-                    msg = "Hi {} {}! Your account is now validated".format(student["firstName"], student["lastName"])
+                # Récupération du channel
+                tcVerification = utils.get(cVerification.text_channels, name="verification")
+                if tcVerification != None and tcVerification == message.channel:
+                    msg = "This is not a valid id"
+                    if message.content in self.dicGuilds[message.guild.id]["students"]:
+                        student = self.dicGuilds[message.guild.id]["students"][message.content]
 
-                    roleName = "Group" + str(student["group"])
-                    await message.author.add_roles(utils.get(message.guild.roles, name=roleName))
-                    
-                    self.dicGuilds[message.guild.id]["registredStudents"].append(student)
-                    del self.dicGuilds[message.guild.id]["students"][message.content]
+                        await message.author.edit(nick="{} {}".format(student["firstName"], student["lastName"]))
+                        msg = "Hi {} {}! Your account is now validated".format(student["firstName"], student["lastName"])
 
-                await tcVerification.send(msg)
-                await message.delete()
+                        roleName = "group-{}".format(student["group"])
+                        await message.author.add_roles(utils.get(message.guild.roles, name=roleName))
+                        
+                        self.dicGuilds[message.guild.id]["registredStudents"].append(student)
+                        del self.dicGuilds[message.guild.id]["students"][message.content]
+
+                    await tcVerification.send(msg)
+                    await message.delete()
 
 
 
