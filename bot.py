@@ -1,7 +1,7 @@
 import os
 import sys
 
-#import discord
+import discord
 from discord.ext import commands
 from discord import utils
 
@@ -9,8 +9,8 @@ from cogs import *
 from db.dbo import DBO
 from dotenv import load_dotenv
 
-
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 dicGuilds = dict()
 
@@ -22,7 +22,7 @@ textChannelsName = {
     "Student-zone": [],
 }
 
-hardcodedStudents = [{"id": "1835343", "firstName": "William", "lastName": "Fecteau"}]
+hardcodedStudents = {"1835343": {"firstName": "William", "lastName": "Fecteau"}}
 
 
 @bot.event
@@ -72,6 +72,7 @@ async def InitServer(guild):
     dicGuilds[guild.id] = {}
 
     dicGuilds[guild.id]["isCreating"] = False
+    dicGuilds[guild.id]["students"] = hardcodedStudents
 
     for categoryName in categoriesName:
         # Creating category
