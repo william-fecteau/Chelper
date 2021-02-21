@@ -15,7 +15,7 @@ class Inscription(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not message.author.bot:
+        if not message.author.bot and message.guild != None:
             cVerification = utils.get(message.guild.categories, name="Verification")
             
             # Si la catégorie existe

@@ -18,7 +18,7 @@ categoriesName = ["Verification", "Teacher-update", "Teacher-zone", "Student-zon
 textChannelsName = {
     "Verification": ["verification"],
     "Teacher-update": ["actions"],
-    "Teacher-zone": [],
+    "Teacher-zone": ["homework-hand-in"],
     "Student-zone": [],
 }
 
@@ -59,7 +59,7 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_message(message):
-    if not message.content.startswith('!'):
+    if not message.content.startswith('!') and message.guild != None:
         cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
 
         # If server is in is-creating mode and that the message was sent in actions from the teacher

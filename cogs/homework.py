@@ -29,7 +29,6 @@ class Homework(commands.Cog):
     @commands.Cog.listener()
     #reaction listener
     async def on_reaction_add(self, reaction, user):
-        print(user)
         #user reacts to bot in channel and is not bot
         if not user.bot and reaction.emoji == thumbsUp:
             message1 = await user.send("Hi, send your homework file below or react with the x button to cancel the operation, add a note by sending your file with a message")
