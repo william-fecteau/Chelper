@@ -34,7 +34,7 @@ class OClass(commands.Cog):
             
         group = utils.get(ctx.guild.roles,name="group-"+str(groupNum))
 
-        await groupVC.set_permissions(group, speak=False)
+        await groupVC.set_permissions(group, speak=True)
 
    
 
@@ -45,7 +45,7 @@ class OClass(commands.Cog):
             
         group = utils.get(ctx.guild.roles,name="group-"+str(groupNum))
 
-        await groupVC.set_permissions(group, speak=True)
+        await groupVC.set_permissions(group, speak=False)
 
     
                 
