@@ -92,7 +92,14 @@ async def on_message(message):
                     
                     # TODO: A Welcome message that presents every channel
 
-                    await message.channel.send("Almost done! Please look in your control channel to setup your class schedule with each group :)")
+                    await message.channel.send("Almost done! Please look in your control channel to setup your class schedule with each group :)"+
+                    "\nYou can access the different commands on this menu: ")
+                    for cmd in bot.commands:
+                        if cmd.name == "actions": 
+                            break
+                        else: continue
+                    
+                    await cmd.__call__(message)
                 elif valid:
                     await message.channel.send("Please use a number greater than 0")
 
