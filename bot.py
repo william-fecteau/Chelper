@@ -117,4 +117,8 @@ if __name__ == '__main__':
     bot.add_cog(oclass.OClass(bot))
     bot.add_cog(homework.Homework(bot))
 
+    cog = bot.get_cog('Homework')
+    commands = cog.get_commands()
+    print([c.name for c in commands])
+    print([c.qualified_name for c in cog.walk_commands()])
     bot.run(TOKEN)
