@@ -25,7 +25,6 @@ textChannelsName = {
 hardcodedStudents = {"1835343": {"group": 1, "firstName": "William", "lastName": "Fecteau"}}
 registredStudents = []
 
-
 @bot.event
 async def on_ready():
     for guild in bot.guilds:
@@ -50,34 +49,37 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_message(message):
-    cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
+    if not message.content.startswith('!'):
+        cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
 
-    # If server is in is-creating mode and that the message was sent in actions from the teacher
-    if dicGuilds[message.guild.id]["isCreating"] and message.channel == utils.get(cTeacherUpdate.text_channels, name="actions") and not message.author.bot:   
-        if dicGuilds[message.guild.id]["step"] == 0:
-            await message.guild.edit(name = message.content)
-            dicGuilds[message.guild.id]["step"] += 1
-            await message.channel.send("How many groups would you like to create?")
-        elif dicGuilds[message.guild.id]["step"] == 1:
-            nb = -1
-            try:
-                nb = int(message.content)
-            except:
-                await message.channel.send("Please use a valid integer")
-            
-            if nb > 0:
-                for i in range(nb):
-                    tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
-                    ctrlChannel = await tempCategorie.create_text_channel("control " + str(i+1))
-                    await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
-                    tempCategorie= utils.get(message.guild.categories, name="Student-zone")
-                    await tempCategorie.create_text_channel("Group" + str(i+1))
-                    await tempCategorie.create_voice_channel("Group" +  str(i+1))
-                    await message.guild.create_role(name="Group" +  str(i+1))
+        # If server is in is-creating mode and that the message was sent in actions from the teacher
+        if dicGuilds[message.guild.id]["isCreating"] and message.channel == utils.get(cTeacherUpdate.text_channels, name="actions") and not message.author.bot:   
+            if dicGuilds[message.guild.id]["step"] == 0:
+                await message.guild.edit(name = message.content)
+                dicGuilds[message.guild.id]["step"] += 1
+                await message.channel.send("How many groups would you like to create?")
+            elif dicGuilds[message.guild.id]["step"] == 1:
+                nb = -1
+                try:
+                    nb = int(message.content)
+                except:
+                    await message.channel.send("Please use a valid integer")
 
-                    dicGuilds[message.guild.id]["step"] += 1
-            else:
-                await message.channel.send("Please use a number greater than 0")
+                if nb > 0:
+                    for i in range(nb):
+                        tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
+                        ctrlChannel = await tempCategorie.create_text_channel("control " + str(i+1))
+                        await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
+                        tempCategorie= utils.get(message.guild.categories, name="Student-zone")
+                        await tempCategorie.create_text_channel("Group" + str(i+1))
+                        await tempCategorie.create_voice_channel("Group" +  str(i+1))
+                        await message.guild.create_role(name="Group" +  str(i+1))
+
+                        dicGuilds[message.guild.id]["step"] += 1
+                else:
+                    await message.channel.send("Please use a number greater than 0")
+    else:
+        await bot.process_commands(message)
 
 
 
@@ -117,8 +119,4 @@ if __name__ == '__main__':
     bot.add_cog(oclass.OClass(bot))
     bot.add_cog(homework.Homework(bot))
 
-    cog = bot.get_cog('Homework')
-    commands = cog.get_commands()
-    print([c.name for c in commands])
-    print([c.qualified_name for c in cog.walk_commands()])
     bot.run(TOKEN)
