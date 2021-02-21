@@ -72,10 +72,15 @@ async def on_message(message):
                     await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
                     tempCategorie= utils.get(message.guild.categories, name="Student-zone")
                     await message.guild.create_role(name="Group" +  str(i+1))
+
+                    overwrite = discord.PermissionOverwrite()
+                    overwrite.send_messages = True
+                    overwrite.read_messages = True
+
                     tempChannel = await tempCategorie.create_text_channel("Group" + str(i+1))
-                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), read_messages=true, send_messages=true)
+                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), overwrite=overwrite)
                     tempChannel = await tempCategorie.create_voice_channel("Group" +  str(i+1))
-                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), read_messages=true, send_messages=true)
+                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), overwrite=overwrite)
 
                     dicGuilds[message.guild.id]["step"] += 1
             else:
