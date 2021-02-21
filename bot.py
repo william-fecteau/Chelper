@@ -57,12 +57,12 @@ async def on_message(message):
         elif dicGuilds[message.guild.id]["step"] == 1:
             try:
                 for i in range (int(message.content)):
+                    await message.guild.create_role(name="Group" +  str(i+1))
                     tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
                     await tempCategorie.create_text_channel("Assignments of group " + str(i+1))
                     tempCategorie= utils.get(message.guild.categories, name="Student-zone")
                     await tempCategorie.create_text_channel("Group " + str(i+1))
                     await tempCategorie.create_voice_channel("Group " +  str(i+1))
-                    await message.guild.create_role(name="Group" +  str(i+1))
             except:
                 message.channel.send("Please use a valid integer")
 
