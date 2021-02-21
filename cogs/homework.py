@@ -16,7 +16,7 @@ class Homework(commands.Cog):
 
     #!dm command
     @commands.command()
-    async def dm(self, ctx):
+    async def hmw(self, ctx):
         strDsc = "React to this message with "+ thumbsUp +" if you are ready to hand in your homework"
         embedfield = discord.Embed(title="Homework handing out", description=strDsc, color=0xe0d122)
         embedfield.add_field(name="Due date:", value=datetime.today().strftime('%Y-%m-%d-%H:%M'), inline=False)
