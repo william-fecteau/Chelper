@@ -68,7 +68,7 @@ async def on_message(message):
             if nb > 0:
                 for i in range(nb):
                     tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
-                    ctrlChannel = await tempCategorie.create_text_channel("control " + str(i+1))
+                    ctrlChannel = await tempCategorie.create_text_channel("control-group-" + str(i+1))
                     await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
                     tempCategorie= utils.get(message.guild.categories, name="Student-zone")
                     await tempCategorie.create_text_channel("Group" + str(i+1))
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     # Loading cogs
     bot.add_cog(test.Test(bot))
     bot.add_cog(inscription.Inscription(bot, dicGuilds))
-    bot.add_cog(oclass.OClass(bot))
+    bot.add_cog(oclass.OClass(bot, dicGuilds))
     bot.add_cog(homework.Homework(bot))
 
     bot.run(TOKEN)
