@@ -59,6 +59,7 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_message(message):
+
     if not message.content.startswith('!') and message.guild != None and message.guild.id in dicGuilds:
         cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
 

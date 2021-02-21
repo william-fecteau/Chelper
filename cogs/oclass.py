@@ -30,9 +30,22 @@ class OClass(commands.Cog):
                 
     @commands.command()
     async def opengroup(self, ctx, groupNum : int):
-        pass
+        groupVC = utils.get(ctx.guild.voice_channels, name="group-" + str(groupNum))
+            
+        group = utils.get(ctx.guild.roles,name="group-"+str(groupNum))
+
+        await groupVC.set_permissions(group, speak=False)
+
+   
 
     @commands.command()
-    async def closegroup(self, ctx, groupNum: int):
-        pass
+    async def closegroup(self, ctx, groupNum):
+
+        groupVC = utils.get(ctx.guild.voice_channels, name="group-" + str(groupNum))
+            
+        group = utils.get(ctx.guild.roles,name="group-"+str(groupNum))
+
+        await groupVC.set_permissions(group, speak=True)
+
+    
                 
