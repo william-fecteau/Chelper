@@ -9,8 +9,8 @@ from cogs import *
 from db.dbo import DBO
 from dotenv import load_dotenv
 
-
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 dicGuilds = dict()
 
