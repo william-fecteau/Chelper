@@ -28,4 +28,11 @@ class OClass(commands.Cog):
 
             ##self.dicGuilds[message.guild.id]["classes"]["group-"+str(nbChannel)][day] = 
                 
+    @commands.command()
+    async def opengroup(self, ctx, groupNum : int):
+        pass
+
+    @commands.command()
+    async def closegroup(self, ctx, groupNum: int):
+        pass
                 

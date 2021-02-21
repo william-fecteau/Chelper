@@ -28,13 +28,13 @@ registredStudents = []
 @bot.event
 async def on_ready():
     for guild in bot.guilds:
-        # TODO: FOR TESTING REMOVE LATER
         # TODO dicGuilds should come from DB
         dicGuilds[guild.id] = {}
+
+        # TODO: FOR TESTING REMOVE LATER
         dicGuilds[guild.id]["nbGroup"] = 2
         dicGuilds[guild.id]["isCreating"] = False
-        dicGuilds[guild.id]["students"] = hardcodedStudents
-        dicGuilds[guild.id]["registredStudents"] = registredStudents
+
         await InitServer(guild)
 
 
@@ -59,7 +59,7 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_message(message):
-    if not message.content.startswith('!') and message.guild != None:
+    if not message.content.startswith('!') and message.guild != None and message.guild.id in dicGuilds:
         cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
 
         # If server is in is-creating mode and that the message was sent in actions from the teacher
@@ -82,47 +82,80 @@ async def on_message(message):
                     dicGuilds[message.guild.id]["step"] += 1
 
                     await InitServer(message.guild)
+
+                    # Sending next message in control channels
+                    cTeacherZone = utils.get(message.guild.categories, name="Teacher-zone")
+                    for i in range(1, dicGuilds[message.guild.id]["nbGroup"] + 1):
+                        tcCurGroup = utils.get(cTeacherZone.text_channels, name="control-{}".format(i))
+                        await tcCurGroup.send("When is your class with the group {}? (Ex: Thursday 8h15-10h15)".format(i))
+                    
+                    # TODO: A Welcome message that presents every channel
+
+                    await message.channel.send("Almost done! Please look in your control channel to setup your class schedule with each group :)")
                 elif valid:
                     await message.channel.send("Please use a number greater than 0")
+
     else:
         await bot.process_commands(message)
 
 
 
 async def InitServer(guild):
+    # TODO: dicGuilds should come from DB
+    dicGuilds[guild.id]["students"] = hardcodedStudents
+    dicGuilds[guild.id]["registredStudents"] = registredStudents
+
     for categoryName in categoriesName:
         # Creating category
         curCategory = utils.get(guild.categories, name=categoryName)
         if curCategory == None:
             curCategory = await guild.create_category_channel(categoryName)
         
+        # By default, we hide every category for default user
+        await curCategory.set_permissions(guild.default_role, read_messages=False, send_messages=False)
+
         # Creating text channels for this category
         for tcName in textChannelsName[categoryName]:
             curTextChannel = utils.get(curCategory.text_channels, name=tcName)
             if not curTextChannel:
                 curTextChannel = await curCategory.create_text_channel(tcName)
-        
+
+            # By default, we hide every text channel for default user
+            await curTextChannel.set_permissions(guild.default_role, read_messages=False, send_messages=False)
+
     # Creating channels for all the groups
+    cVerification = utils.get(guild.categories, name="Verification")
     for i in range(1, dicGuilds[guild.id]["nbGroup"] + 1):
         control_channel_name = "control-{}".format(i)
         group_channel_name = "group-{}".format(i)
 
         cTeacherZone = utils.get(guild.categories, name="Teacher-zone")
-        tcControl = utils.get(cTeacherZone.text_channels, name = control_channel_name)
+        tcControl = utils.get(cTeacherZone.text_channels, name=control_channel_name)
         if tcControl == None: 
             ctrlChannel = await cTeacherZone.create_text_channel(control_channel_name)
 
         cStudentZone = utils.get(guild.categories, name="Student-zone")
         tcGroup = utils.get(cStudentZone.text_channels, name=group_channel_name)
         if tcGroup == None:
-            await cStudentZone.create_text_channel(group_channel_name)
+            tcGroup = await cStudentZone.create_text_channel(group_channel_name)
         vcGroup = utils.get(cStudentZone.voice_channels, name=group_channel_name)
         if vcGroup == None:
-            await cStudentZone.create_voice_channel(group_channel_name)
+            vcGroup = await cStudentZone.create_voice_channel(group_channel_name)
 
-        await guild.create_role(name=group_channel_name)
+        groupRole = await guild.create_role(name=group_channel_name)
+        await cVerification.set_permissions(groupRole, read_messages=False, send_messages=False)
+        await tcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
+        await vcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
 
-        # await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
+
+    # ======================== Specific permissions ========================
+    # - Verification must be accessible for every user on login
+    cVerification = utils.get(guild.categories, name="Verification")
+    await cVerification.set_permissions(guild.default_role, read_messages=True, send_messages=True)
+    for channel in cVerification.text_channels:
+        await channel.set_permissions(guild.default_role, read_messages=True, send_messages=True)
+            
+
 
 if __name__ == '__main__':
     # .ENV loading
