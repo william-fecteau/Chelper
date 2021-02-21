@@ -11,6 +11,7 @@ class Homework(commands.Cog):
         self.message = None
         self.user = None
         self.channelHandIn = None
+        self.waitingForFile = False
 
 
     #!dm command
@@ -31,20 +32,30 @@ class Homework(commands.Cog):
         print(user)
         #user reacts to bot in channel and is not bot
         if not user.bot and reaction.emoji == thumbsUp:
-            message1 = await user.send("Hi, send your homework file below or react with the x button to cancel the operation")
+            message1 = await user.send("Hi, send your homework file below or react with the x button to cancel the operation, add a note by sending your file with a message")
             self.user = user
             await message1.add_reaction(xButton)
+            self.waitingForFile = True
         #user reacts X in dm and its not bot
-        if reaction.emoji == xButton and not user.bot:
+        if reaction.emoji == xButton and not user.bot and self.waitingForFile:
             await user.send("Hand-in cancelled")
+            self.waitingForFile = False
     
     @commands.Cog.listener()
     #message listener        
     async def on_message(self, message):
-        if not message.guild and message.author == self.user:
-            print(message.author)
-            embedLog = discord.Embed(title="Homework received", description=datetime.today().strftime('%Y-%m-%d-%H:%M'), color=0x00ff00)
-            embedLog.add_field(name="Student: ", value=message.author.display_name, inline=False)
-            embedLog.add_field(name="File: ", value=message.attachments[0].url, inline=False)
-            await self.channelHandIn.send(embed=embedLog)
-            await message.channel.send("File uploaded successfully!")
+        #bot is waiting for a file and message is not in server (dms) and the sender isn't the bot
+        if self.waitingForFile and not message.guild and not message.author.bot:
+            #file present with message
+            if message.attachments:
+                embedLog = discord.Embed(title="Homework received", description=datetime.today().strftime('%Y-%m-%d-%H:%M'), color=0x00ff00)
+                embedLog.add_field(name="Student: ", value=message.author.display_name, inline=False)
+                #if message has somethign written with it
+                if message.content:
+                    embedLog.add_field(name="Student's note: ", value=message.content, inline=False)
+                embedLog.add_field(name="File: ", value=message.attachments[0].url, inline=False)
+                await self.channelHandIn.send(embed=embedLog)
+                await message.channel.send("File uploaded successfully!")
+                self.waitingForFile = False
+            #no files attached
+            else: await message.channel.send("No file sent")
