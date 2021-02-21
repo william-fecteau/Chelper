@@ -34,6 +34,10 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
+    for channel in guild.channels:
+        await channel.delete()
+
+    # TODO: Faire le InitServer à la fin du setup du serveur
     await InitServer(guild)
     
     # Creating the first text channel (#actions)
@@ -49,23 +53,33 @@ async def on_message(message):
     cTeacherUpdate = utils.get(message.guild.categories, name="Teacher-update")
 
     # If server is in is-creating mode and that the message was sent in actions from the teacher
-    if dicGuilds[message.guild.id]["isCreating"] and message.channel == utils.get(cTeacherUpdate.text_channels, name="actions") and not message.author.bot:
+    if dicGuilds[message.guild.id]["isCreating"] and message.channel == utils.get(cTeacherUpdate.text_channels, name="actions") and not message.author.bot:   
         if dicGuilds[message.guild.id]["step"] == 0:
             await message.guild.edit(name = message.content)
             dicGuilds[message.guild.id]["step"] += 1
             await message.channel.send("How many groups would you like to create?")
         elif dicGuilds[message.guild.id]["step"] == 1:
+            nb = -1
             try:
-                for i in range (int(message.content)):
-                    await message.guild.create_role(name="Group" +  str(i+1))
-                    tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
-                    await tempCategorie.create_text_channel("Assignments of group " + str(i+1))
-                    tempCategorie= utils.get(message.guild.categories, name="Student-zone")
-                    await tempCategorie.create_text_channel("Group " + str(i+1))
-                    await tempCategorie.create_voice_channel("Group " +  str(i+1))
+                nb = int(message.content)
             except:
-                message.channel.send("Please use a valid integer")
+                await message.channel.send("Please use a valid integer")
+            
+            if nb > 0:
+                for i in range(nb):
+                    tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
+                    ctrlChannel = await tempCategorie.create_text_channel("control " + str(i+1))
+                    await ctrlChannel.send("When is your class with the group " + str(i+1) + "? (Ex: Thursday 8h15-10h15)")
+                    tempCategorie= utils.get(message.guild.categories, name="Student-zone")
+                    await message.guild.create_role(name="Group" +  str(i+1))
+                    tempChannel = await tempCategorie.create_text_channel("Group" + str(i+1))
+                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), read_messages=true, send_messages=true)
+                    tempChannel = await tempCategorie.create_voice_channel("Group" +  str(i+1))
+                    await tempChannel.set_permissions(utils.get(message.guild.roles, name="Group" + str(i+1)), read_messages=true, send_messages=true)
 
+                    dicGuilds[message.guild.id]["step"] += 1
+            else:
+                await message.channel.send("Please use a number greater than 0")
 
 
 
