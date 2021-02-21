@@ -131,6 +131,16 @@ async def InitServer(guild):
             # By default, we hide every text channel for default user
             await curTextChannel.set_permissions(guild.default_role, read_messages=False, send_messages=False)
 
+    # Creating teacher role
+    teacherRole = utils.get(guild.roles, name="Teacher")
+    if teacherRole == None:
+        teacherPermission = discord.Permissions()
+        teacherPermission.update(administrator = True)
+
+        teacherRole = await guild.create_role(name="Teacher", permissions=teacherPermission)
+        await teacherRole.edit(position=1, colour=discord.Colour.blue(), hoist=True, mentionable=False)
+        await guild.owner.add_roles(teacherRole)
+
     # Creating channels for all the groups
     cVerification = utils.get(guild.categories, name="Verification")
     for i in range(1, dicGuilds[guild.id]["nbGroup"] + 1):
@@ -150,12 +160,17 @@ async def InitServer(guild):
         if vcGroup == None:
             vcGroup = await cStudentZone.create_voice_channel(group_channel_name)
 
+        # adding role for this group
         role = utils.get(guild.roles, name=group_channel_name)
         if role == None:
             groupRole = await guild.create_role(name=group_channel_name)
+            await groupRole.edit(position=1, hoist=True, mentionable=True)
             await cVerification.set_permissions(groupRole, read_messages=False, send_messages=False)
             await tcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
             await vcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
+
+
+
 
 
     # ======================== Specific permissions ========================

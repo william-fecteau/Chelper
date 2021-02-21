@@ -11,6 +11,7 @@ class Inscription(commands.Cog):
         cVerification = utils.get(member.guild.categories, name="Verification")
         tcVerification = utils.get(cVerification.text_channels, name="verification")
 
+        #await member.add_roles(utils.get(member.guild.roles, name="to-be-verified"))
         await tcVerification.send("To verifiy your identity, please enter your ID number in this chat (Don't worry, nobody will see it ;) )")
 
     @commands.Cog.listener()
