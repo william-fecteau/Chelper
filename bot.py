@@ -50,8 +50,22 @@ async def on_message(message):
     # If server is in is-creating mode and that the message was sent in actions from the teacher
     if dicGuilds[message.guild.id]["isCreating"] and message.channel == utils.get(cTeacherUpdate.text_channels, name="actions") and not message.author.bot:
         if dicGuilds[message.guild.id]["step"] == 0:
-            #await message.guild.edit(message.content)
+            await message.guild.edit(name = message.content)
             dicGuilds[message.guild.id]["step"] += 1
+            await message.channel.send("How many groups would you like to create?")
+        elif dicGuilds[message.guild.id]["step"] == 1:
+            try:
+                for i in range (int(message.content)):
+                    tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
+                    await tempCategorie.create_text_channel("Assignments of group " + str(i+1))
+                    tempCategorie= utils.get(message.guild.categories, name="Student-zone")
+                    await tempCategorie.create_text_channel("Group " + str(i+1))
+                    await tempCategorie.create_voice_channel("Group " +  str(i+1))
+                    await message.guild.create_role(name="Group" +  str(i+1))
+            except:
+                message.channel.send("Please use a valid integer")
+
+
 
 
 async def InitServer(guild):
