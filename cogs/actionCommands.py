@@ -45,12 +45,11 @@ class ACommands(commands.Cog):
     #reaction listener
     async def on_reaction_add(self, reaction, user):
         if reaction.message == self.messageActions and not user.bot:
+            await reaction.remove(user)
             index = nReacts.index(reaction.emoji)
             command = list(self.commands.items())[index][0]
-            print(command)
             found = False
             for cmd in self.bot.commands:
-                print(cmd)
                 if cmd.name == command: 
                     found = True
                     break 

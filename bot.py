@@ -182,7 +182,7 @@ if __name__ == '__main__':
     bot.add_cog(test.Test(bot))
     bot.add_cog(inscription.Inscription(bot, dicGuilds))
     bot.add_cog(oclass.OClass(bot, dicGuilds))
-    bot.add_cog(homework.Homework(bot))
+    bot.add_cog(homework.Homework(bot, dicGuilds))
     bot.add_cog(actionCommands.ACommands(bot))
 
     bot.run(TOKEN)

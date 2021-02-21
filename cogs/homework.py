@@ -6,17 +6,21 @@ thumbsUp = '\N{THUMBS UP SIGN}'
 xButton = '❌'
 
 class Homework(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, dicGuilds):
         self.bot = bot
         self.message = None
         self.user = None
         self.channelHandIn = None
         self.waitingForFile = False
+        self.dicGuilds = dicGuilds
 
 
     #!dm command
     @commands.command()
     async def hmw(self, ctx):
+        #ask what group
+        #print(self.dicGuilds[ctx.guild.id])
+        
         strDsc = "React to this message with "+ thumbsUp +" if you are ready to hand in your homework"
         embedfield = discord.Embed(title="Homework handing out", description=strDsc, color=0xe0d122)
         embedfield.add_field(name="Due date:", value=datetime.today().strftime('%Y-%m-%d-%H:%M'), inline=False)
