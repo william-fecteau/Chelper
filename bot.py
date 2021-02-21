@@ -65,6 +65,8 @@ async def on_message(message):
             except:
                 await message.channel.send("Please use a valid integer")
             
+            dicGuilds[message.guild.id]["classes"] = {}
+
             if nb > 0:
                 for i in range(nb):
                     tempCategorie= utils.get(message.guild.categories, name="Teacher-zone")
@@ -75,6 +77,7 @@ async def on_message(message):
                     await tempCategorie.create_voice_channel("Group" +  str(i+1))
                     await message.guild.create_role(name="Group" +  str(i+1))
 
+                    dicGuilds[message.guild.id]["classes"]["group-"+str(i+1)] = {}
                     dicGuilds[message.guild.id]["step"] += 1
             else:
                 await message.channel.send("Please use a number greater than 0")

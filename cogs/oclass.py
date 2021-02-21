@@ -1,13 +1,15 @@
 from discord.ext import commands
 from discord import utils
 
+import datetime
+
 class OClass(commands.Cog):
     def __init__(self, bot, dicGuilds):
         self.bot = bot
 
         self.dicGuilds = dicGuilds
 
-        self.daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        self.daysOfWeek = ["sunday", "tuesday", "wednesday", "thursday", "friday", "saturday", "monday"]
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -21,5 +23,9 @@ class OClass(commands.Cog):
 
             startH, startM = start.split("h")
             finishH, finishM = finish.split("h")
+
+            datetime = datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
+
+            ##self.dicGuilds[message.guild.id]["classes"]["group-"+str(nbChannel)][day] = 
                 
                 
