@@ -13,10 +13,10 @@ class OClass(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not message.author.bot and message.channel.name[:-1] == "control-group-":
+        if message.guild != None and not message.author.bot and message.channel.name[:-1] == "control-":
             nbChannel = message.channel.name[-1]
             cTeacherZone = utils.get(message.guild.categories, name="Teacher-zone")
-            tcCurGroup = utils.get(cTeacherZone.text_channels, name="control-group-"+str(nbChannel))
+            tcCurGroup = utils.get(cTeacherZone.text_channels, name="control-{}".format(nbChannel))
 
             day, hour = message.content.lower().split(" ")
             start, finish = hour.split("-")
