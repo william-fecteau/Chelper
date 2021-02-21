@@ -22,7 +22,8 @@ textChannelsName = {
     "Student-zone": [],
 }
 
-hardcodedStudents = {"1835343": {"firstName": "William", "lastName": "Fecteau"}}
+hardcodedStudents = {"1835343": {"group": 1, "firstName": "William", "lastName": "Fecteau"}}
+registredStudents = []
 
 
 @bot.event
@@ -73,6 +74,7 @@ async def InitServer(guild):
 
     dicGuilds[guild.id]["isCreating"] = False
     dicGuilds[guild.id]["students"] = hardcodedStudents
+    dicGuilds[guild.id]["registredStudents"] = registredStudents
 
     for categoryName in categoriesName:
         # Creating category
