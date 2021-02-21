@@ -143,10 +143,12 @@ async def InitServer(guild):
         if vcGroup == None:
             vcGroup = await cStudentZone.create_voice_channel(group_channel_name)
 
-        groupRole = await guild.create_role(name=group_channel_name)
-        await cVerification.set_permissions(groupRole, read_messages=False, send_messages=False)
-        await tcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
-        await vcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
+        role = utils.get(guild.roles, name=group_channel_name)
+        if role == None:
+            groupRole = await guild.create_role(name=group_channel_name)
+            await cVerification.set_permissions(groupRole, read_messages=False, send_messages=False)
+            await tcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
+            await vcGroup.set_permissions(groupRole, read_messages=True, send_messages=True)
 
 
     # ======================== Specific permissions ========================
@@ -174,5 +176,6 @@ if __name__ == '__main__':
     bot.add_cog(inscription.Inscription(bot, dicGuilds))
     bot.add_cog(oclass.OClass(bot, dicGuilds))
     bot.add_cog(homework.Homework(bot))
+    bot.add_cog(actionCommands.ACommands(bot))
 
     bot.run(TOKEN)
